@@ -6,7 +6,6 @@ I originally started this tool while studying for the OSCP exam as a quick way t
 The simplicity of the tool makes it extremely easy to run.  The primary script is contained in alacarte.sh and the additional smtp-enum.py and users.txt files are only required for executing the SMTP module.
 ```  
 user@kali:~$ ./alacarte.sh
-          _                                         
   \      | |                              _         
  _____   | | _____     ____ _____  ____ _| |_ _____ 
 (____ |  | |(____ |   / ___|____ |/ ___|_   _) ___ |
@@ -16,7 +15,10 @@ Author: 4UT0M4T0N
                                                    
                                                    
 Enter target[:port] or -h for help: -h
-                                          
+                                                   
+                                                   
+*********************************************************************
+                                                   
 A la carte v0.1
 Author: 4UT0M4T0N, Copyright 2020
 Comments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null
@@ -25,7 +27,7 @@ This tool helps automate repetive initial enumeration steps.  Some of the most c
 sions.
 
 USAGE
-./recon.sh [target][:port] [command]
+./alacarte.sh [target][:port] [command]
 
 TARGET
 IPv4 address (can include sub-dirs)
@@ -40,12 +42,14 @@ smtp - requires SMTP enumeration Python script and username list
 snmp - Runs OneSixtyOne, snmp-check, and snmpwalk
 
 EXAMPLES
-./recon.sh
-./recon.sh 192.168.1.5 -- sets target IP
-./recon.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)
-./recon.sh 192.168.1.5:443 -- sets target IP and port
-./recon.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap
-./recon.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command
+./alacarte.sh
+./alacarte.sh 192.168.1.5 -- sets target IP
+./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)
+./alacarte.sh 192.168.1.5:443 -- sets target IP and port
+./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap
+./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command
+
+*********************************************************************
 ```
 ## Main Menu
 This is the primary area of the program and the point from which all of the enumeration commands are launched.
