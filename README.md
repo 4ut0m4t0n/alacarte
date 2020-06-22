@@ -1,9 +1,15 @@
 # A la carte
 
-I originally started this tool while studying for the OSCP exam as a quick way to automate some of the routine enumeration commands.  I had used tools like AutoRecon, but found that the fully automated shotgun approach wasn't always what I was looking for, especially in a learning environment.  I wanted more insight into what I was running and more control over what was actually being run, so I created a basic menu-driven enumeration framework that freed me from having to memorize and retype each command while also allowing me to pick what I wanted to run each time, like ordering your dishes a la carte!   
+I originally started this tool while studying for the OSCP exam as a quick way to automate some routine enumeration commands.  I had used tools like AutoRecon, but found that the fully automated shotgun approach wasn't always what I was looking for, especially in a learning environment.  I wanted more insight into what I was running and more control over what was actually being run, so I created a menu-driven enumeration framework that freed me from having to memorize and retype each command while also allowing me to choose what I wanted each time, like ordering a meal a la carte!
+
+## What does it do?
+Provides a menu-driven workflow that allows users to execute complex enumeration commands with ease.  The tool includes seven default modules, but also allows the user to add custom commands if they wish (persistent across sessions).  While some modules contain a single command, most will run several different similar programs (i.e. dirsearch, gobuster, and dirb for directory enumeration). This redundancy is intentionally designed to reduce the likelihood of critical enumeration data being missed.  
+
+## Who should use this tool?
+While A la carte can be used by anyone performing enumeration against a single target host, it was designed with the infosec student in mind. It provides the ability to pick and choose which tools to run when, thus helping a student better understand enumeration processes and over time develop their own preferred strategies, all while not having to worry about memorizing command syntax.
 
 ## Guide
-The simplicity of the tool makes it extremely easy to run.  The primary script is contained in alacarte.sh and the additional smtp-enum.py and users.txt files are only required for executing the SMTP module.
+The tool is (hopefully) pretty intuitive and easy to use.  The primary script is contained in alacarte.sh and the additional smtp-enum.py and users.txt files are only required for executing the SMTP module.
 ```  
 user@kali:~$ ./alacarte.sh
   \      | |                              _         
@@ -123,6 +129,57 @@ This module attempts to verify whether specified user accounts exist on the targ
 
 ### Add
 This module allows the user to insert a custom-defined command into the menu.  As long as the alacarte.txt file is not moved/deleted between sessions, the custom commands will persistent across sessions.
+Example:
+Adding threader3000.py (Author: Joe Helle https://github.com/dievus/threader3000) as a custom command.
+```
+Current target: Not set
+
+DEFAULT COMMANDS
+(1) Change target
+(2) nmap
+(3) Directory enumeration (HTTP)
+(4) Directory enumeration (HTTPS)
+(5) SMB enumeration
+(6) Nikto scan
+(7) SMTP user scan
+(8) SNMP enumeration
+(9) Add a custom command
+(10) Delete a custom command
+(11) Help
+(12) Out of ideas...
+(13) Exit
+
+CUSTOM COMMANDS
+None
+
+Select a # to run: 9
+
+Type the command to add. Use 'target' as an IP placeholder (i.e ping target): python3 threader3000.py target
+```
+Now available to run from the main menu.
+```
+Current target: Not set
+
+DEFAULT COMMANDS
+(1) Change target
+(2) nmap
+(3) Directory enumeration (HTTP)
+(4) Directory enumeration (HTTPS)
+(5) SMB enumeration
+(6) Nikto scan
+(7) SMTP user scan
+(8) SNMP enumeration
+(9) Add a custom command
+(10) Delete a custom command
+(11) Help
+(12) Out of ideas...
+(13) Exit
+
+CUSTOM COMMANDS
+(14) python3 threader3000.py target
+
+Select a # to run: 
+```
 
 ### Delete
 Allows the user to delete a specified custom command.
