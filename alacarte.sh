@@ -1,3 +1,5 @@
+#add output to SMB
+#add recursive to dirsearch
 
 
 #Copyright 2020, 4UT0M4T0N
@@ -44,7 +46,7 @@ ${GRAY}Author: 4UT0M4T0N${NONE}\n\n"
 
                                                                                                                                                                                                           
 help() {
-	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N, Copyright 2020\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick, Full, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - requires SMTP enumeration Python script and username list\nsnmp - Runs OneSixtyOne, snmp-check, and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
+	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N, Copyright 2020\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - requires SMTP enumeration Python script and username list\nsnmp - Runs OneSixtyOne, snmp-check, and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
 menu
 
 }
@@ -97,26 +99,27 @@ call_option() {
 
 		#nmap
 		$nmap|"nmap")
+			mkdir ./Recon/nmap 2>/dev/null
 			echo -e "${GREEN}${BOLD}===== Running Quick Nmap TCP CONNECT scan ======${NONE}"
-			cmd="nmap -sT -Pn --top-ports 100 -T4 --reason -v -oA Recon/nmap_quick $targetIP"
+			cmd="nmap -sT -Pn --top-ports 100 -T4 --reason -v -oN ./Recon/nmap/nmap-quick_$targetIP.results $targetIP"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Running Nmap UDP scan ======${NONE}"
-			cmd="nmap -sU -Pn --top-ports 100 -T4 -v -oA Recon/nmap_quick_udp $targetIP"
+			cmd="nmap -sU -Pn --top-ports 100 -T4 -v -oN ./Recon/nmap/nmap-quick-udp_$targetIP.results $targetIP"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Running Full Nmap TCP CONNECT scan ======${NONE}"
-			cmd="nmap -sT -Pn -A -p- -T4 -v -oA Recon/nmap_full $targetIP"
+			cmd="nmap -sT -Pn -A -p- -T4 -v -oN ./Recon/nmap/nmap-full_$targetIP.results $targetIP"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Running Full Nmap vuln scan ======${NONE}"
-			cmd="nmap -sT -Pn -A --script vuln -p- -T4 -v -oA Recon/nmap_full $targetIP"
+			cmd="nmap -sT -Pn -A --script vuln -p- -T4 -v -oN ./Recon/nmap/nmap-vulns_$targetIP.results $targetIP"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
@@ -124,21 +127,21 @@ call_option() {
 				
 		#dir enum
 		$dir_http|"dir_http")
-
+			mkdir ./Recon/http_dir 2>/dev/null
 			echo -e "${GREEN}${BOLD}===== Running dirsearch =====${NONE}\n"
-			cmd="python3 $(locate -b "dirsearch.py" | head -n 1) -u http://$targetIP -e php,txt,html,asp --simple-report ./Recon/http_dirsearch.results"
+			cmd="python3 $(locate -b "dirsearch.py" | head -n 1) -R 3 -u http://$targetIP -e php,txt,html,asp --simple-report ./Recon/http_dir/http-dirsearch_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 		
 			echo -e "${GREEN}${BOLD}===== Running Gobuster =====${NONE}\n"
-			cmd='gobuster dir -u http://'$targetIP' -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o ./Recon/http_gobuster.results'
+			cmd="gobuster dir -u http://$targetIP -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o ./Recon/http_dir/http-gobuster_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Running Dirb =====${NONE}\n"
-			cmd='dirb http://'$targetIP' /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -w -o ./Recon/http_dirb.results'
+			cmd="dirb http://$targetIP /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -w -o ./Recon/http_dir/http-dirb_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
@@ -147,17 +150,17 @@ call_option() {
 		#HTTPS
 		$dir_https|"dir_https")
 			echo -e "${GREEN}${BOLD}===== Running dirsearch =====${NONE}\n"
-			cmd="python3 $(find / -name "dirsearch.py" -type f 2>/dev/null -print -quit) -u https://$targetIP -e php,txt,html,asp --simple-report ./Recon/https_dirsearch.results"
+			cmd="python3 $(find / -name "dirsearch.py" -type f 2>/dev/null -print -quit) -u https://$targetIP -e php,txt,html,asp --simple-report ./Recon/https-dirsearch_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 		
 			echo -e "${GREEN}${BOLD}===== Running Gobuster =====${NONE}\n"
-			cmd='gobuster dir -u https://'$targetIP' -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o ./Recon/https_gobuster.results'
+			cmd="gobuster dir -u https://$targetIP -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -o ./Recon/https-gobuster_$targetIP.results"
 		
 
 			echo -e "${GREEN}${BOLD}===== Running Dirb =====${NONE}\n"
-			cmd='dirb https://'$targetIP' /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -w -o ./Recon/https_dirb.results'
+			cmd="dirb https://$targetIP /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -w -o ./Recon/https-dirb_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
@@ -165,88 +168,92 @@ call_option() {
 		
 		#SMB
 		$smb|"smb")
+			mkdir ./Recon/SMB 2>/dev/null
+			out="./Recon/SMB/enum4linux_$targetIP.results"
                         echo -e "${GREEN}${BOLD}===== Running enum4linux =====${NONE}\n"
-			cmd='enum4linux -a '$targetIP''
+			cmd="enum4linux -a $targetIP > ./Recon/SMB/enum4linux_$targetIP.results"
                         echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			printf '\n'
 
                         echo -e "${GREEN}${BOLD}===== Running nbtscan =====${NONE}\n"
-			cmd='nbtscan -r '$targetIP''
+			cmd="nbtscan -r $targetIP > ./Recon/SMB/nbtscan_$targetIP.results"
                         echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			printf '\n'
 
                         echo -e "${GREEN}${BOLD}===== Running nmap smb-os-discovery =====${NONE}\n"
-                        cmd='nmap -Pn -v -p 139,445 --script=smb-os-discovery '$targetIP''
+                        cmd="nmap -Pn -v -p 139,445 --script=smb-os-discovery $targetIP -oN ./Recon/SMB/nmap-smb-os-discovery_$targetIP.results"
                         echo -e "${RED}${BOLD}$cmd\n${NONE}"
                         $cmd
                         printf '\n'
 			
 			echo -e "${GREEN}${BOLD}===== Running nmap smb-protocols =====${NONE}\n"
-                        cmd='nmap -Pn -v -p139,445 --script=smb-protocols '$targetIP''
+                        cmd="nmap -Pn -v -p139,445 --script=smb-protocols $targetIP -oN ./Recon/SMB/nmap-smb-protocols_$targetIP.results"
                         echo -e "${RED}${BOLD}$cmd\n${NONE}"
                         $cmd
                         printf '\n'
 
 
                         echo -e "${GREEN}${BOLD}===== Running nmap smb vuln scripts =====${NONE}\n"
-                        cmd='nmap -Pn -v -p 139,445 --script=smb-vuln* '$targetIP''
+                        cmd="nmap -Pn -v -p 139,445 --script=smb-vuln* $targetIP -oN ./Recon/SMB/nmap-smb-vulns_$targetIP.results"
                         echo -e "${RED}${BOLD}$cmd\n${NONE}"
                         $cmd
                         printf '\n'
 
 			echo -e "${GREEN}${BOLD}===== Running nmap SMB scripts =====${NONE}\n"
-			cmd='nmap -Pn -p 139,445 --script=smb-enum* '$targetIP''
+			cmd="nmap -Pn -p 139,445 --script=smb-enum* $targetIP -oN ./Recon/SMB/nmap-smb-enum_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			printf '\n'
 
 			echo -e "${GREEN}${BOLD}===== Enumerating host with smbmap =====\n${NONE}"
-			cmd='smbmap -H '$targetIP''
+			cmd="smbmap -H $targetIP > ./Recon/SMB/smbmap_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Listing shares with smbclient =====${NONE}\n"
-			cmd='smbclient -L //'$targetIP''
+			cmd="smbclient -L //$targetIP > ./Recon/SMB/smbclient-list_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
 			
 			echo -e "${GREEN}${BOLD}===== Testing for anonymous login =====${NONE}\n"
-			cmd='smbclient -L //'$targetIP' -U"%"'
+			cmd="smbclient -L //$targetIP -U\"%\""
 			echo -e "${RED}${BOLD}$cmd${NONE}\n" 
 			$cmd
 			;; 
 		#Nikto
 		$nikto|"nikto")
-			touch ./Recon/http_nikto.results
+			mkdir ./Recon/Nikto 2>/dev/null
+			touch ./Recon/Nikto/http-nikto_$targetIP.results
 			echo -e "${GREEN}${BOLD}===== Running Nikto query =====${NONE}\n"
-			cmd='nikto -host '$targetIP' -port 80 -maxtime=60s -C all -Format txt -output ./Recon/http_nikto.results'
+			cmd="nikto -host $targetIP -port 80 -maxtime=60s -C all -Format txt -output ./Recon/Nikto/http-nikto_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 			
-			touch ./Recon/https_nikto.results
-			cmd='nikto -host '$targetIP' -port 443 -maxtime=60s -C all -Format txt -output ./Recon/https_nikto.results'
+			touch ./Recon/Nikto/https-nikto_$targetIP.results
+			cmd="nikto -host $targetIP -port 443 -maxtime=60s -C all -Format txt -output ./Recon/Nikto/https-nikto_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}"
 			$cmd
 			;;	
 	
 		#SMTP
 		$smtp|"smtp")	
-			echo -n "Filename containg usernames: "
+			echo -n "Filename containing usernames: "
 			read file
 			echo -e "${GREEN}${BOLD}===== Enumerating SMTP =====${NONE}\n"
-			cmd='python smtp_enum.py '$targetIP' '$file''
+			cmd="python smtp_enum.py $targetIP $file > smtp_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 			;;	
 
 		#SNMP
-		$snmp|"snmp")	
+		$snmp|"snmp")
+			mkdir ./Recon/SNMP 2>/dev/null	
 			echo -e "${GREEN}${BOLD}===== Onesixtyone =====${NONE}\n"
 			touch "Recon/snmp_communities"
 			echo "public" > Recon/snmp_communities
@@ -266,28 +273,28 @@ call_option() {
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk users =====${NONE}\n"
 			touch "Recon/snmpwalk_results_users"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.4.1.77.1.2.25 >> Recon/snmpwalk_results_users"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.4.1.77.1.2.25 > ./Recon/SNMP/snmpwalk-users_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk running processes =====${NONE}\n"
 			touch "Recon/snmpwalk_results_processes"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.4.2.1.2"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.4.2.1.2 > ./Recon/SNMP/snmpwalk-processes_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk installed software =====${NONE}\n"
 			touch "Recon/snmpwalk_results_processes"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.6.3.1.2"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.6.3.1.2 > ./Recon/SNMP/snmpwalk-software_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk all=====${NONE}\n"
 			touch "Recon/snmpwalk_all_results"
-			cmd="snmpwalk -c public -v1 -t 10 $targetIP"
+			cmd="snmpwalk -c public -v1 -t 10 $targetIP > snmpwalk-all_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
@@ -341,8 +348,8 @@ call_option() {
 			
 		*)
 			echo -e "${GREEN}${BOLD}===== Running Custom Command  =====${NONE}\n"
-			cmd=${list[(($choice-1))]}
-			cmd=${cmd//target/$targetIP}
+			cmd="${list[(($choice-1))]}"
+			cmd="${cmd//target/$targetIP}"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
