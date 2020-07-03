@@ -2,6 +2,10 @@
 
 I originally started this tool while studying for the OSCP exam as a quick way to automate some routine enumeration commands.  I had used tools like AutoRecon, but found that the fully automated shotgun approach wasn't always what I was looking for, especially in a learning environment.  I wanted more insight into what I was running and more control over what was actually being run, so I created a menu-driven enumeration framework that freed me from having to memorize and retype each command while also allowing me to choose what I wanted each time, like ordering a meal from a menu a la carte!
 
+I am not even close to being an expert programmer and did this project for fun.  I'm sure there are plenty of ways I could have done things differently/better, so I welcome your suggestions!
+
+Thanks to [dievus](https://www.github.com/dievus) and [Gr1mmie](https://www.github.com/Gr1mmie) for your feedback and helping me get this off the ground.
+
 ## What does it do?
 Provides a menu-driven workflow that allows users to execute complex enumeration commands with ease.  The tool includes seven default modules, but also allows the user to add custom commands if they wish (persistent across sessions).  While some modules contain a single command, most will run several different similar programs (i.e. dirsearch, gobuster, and dirb for directory enumeration). This redundancy is intentionally designed to reduce the likelihood of critical enumeration data being missed.  
 
