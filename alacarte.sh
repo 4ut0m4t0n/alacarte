@@ -40,8 +40,7 @@ BANNER="${YELLOW}
  _____   | | _____     ____ _____  ____ _| |_ _____ 
 (____ |  | |(____ |   / ___|____ |/ ___|_   _) ___ |
 / ___ |  | |/ ___ |  ( (___/ ___ | |     | |_| ____|
-\ ____|   \_)_____|   \____)_____|_|      \__)_____)
-${GRAY}Author: 4UT0M4T0N${NONE}\n\n"
+\ ____|   \_)_____|   \____)_____|_|      \__)_____)\n"
 
 
                                                                                                                                                                                                           
@@ -255,46 +254,41 @@ call_option() {
 		$snmp|"snmp")
 			mkdir ./Recon/SNMP 2>/dev/null	
 			echo -e "${GREEN}${BOLD}===== Onesixtyone =====${NONE}\n"
-			touch "Recon/snmp_communities"
-			echo "public" > Recon/snmp_communities
-			echo "private" >> Recon/snmp_communities
-			echo "manager" >> Recon/snmp_communities
-			cmd='onesixtyone -c Recon/snmp_communities '$targetIP''
+			touch "Recon/SNMP/snmp_communities"
+			echo "public" > Recon/SNMP/snmp_communities
+			echo "private" >> Recon/SNMP/snmp_communities
+			echo "manager" >> Recon/SNMP/snmp_communities
+			cmd="onesixtyone -c Recon/SNMP/snmp_communities $targetIP -o ./Recon/SNMP/onesixtyone_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""		
 	
-			echo -e "${GREEN}${BOLD}===== snmp-check =====${NONE}\n"
-			touch "Recon/snmp_check_results"
-			cmd="snmp-check $targetIP -c Public"
-			echo -e "${RED}${BOLD}$cmd${NONE}\n"
-			$cmd
-			echo ""
+		#	echo -e "${GREEN}${BOLD}===== snmp-check =====${NONE}\n"
+		#	cmd="snmp-check $targetIP -c Public | tee ./Recon/SNMP/snmp-check-results_$targetIP.results"
+		#	echo -e "${RED}${BOLD}$cmd${NONE}\n"
+		#	$cmd
+		#	echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk users =====${NONE}\n"
-			touch "Recon/snmpwalk_results_users"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.4.1.77.1.2.25 > ./Recon/SNMP/snmpwalk-users_$targetIP.results"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.4.1.77.1.2.25 | tee ./Recon/SNMP/snmpwalk-users_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk running processes =====${NONE}\n"
-			touch "Recon/snmpwalk_results_processes"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.4.2.1.2 > ./Recon/SNMP/snmpwalk-processes_$targetIP.results"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.4.2.1.2 | tee ./Recon/SNMP/snmpwalk-processes_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk installed software =====${NONE}\n"
-			touch "Recon/snmpwalk_results_processes"
-			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.6.3.1.2 > ./Recon/SNMP/snmpwalk-software_$targetIP.results"       	
+			cmd="snmpwalk -c public -v1 $targetIP 1.3.6.1.2.1.25.6.3.1.2 | tee ./Recon/SNMP/snmpwalk-software_$targetIP.results"       	
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
 
 			echo -e "${GREEN}${BOLD}===== snmpwalk all=====${NONE}\n"
-			touch "Recon/snmpwalk_all_results"
-			cmd="snmpwalk -c public -v1 -t 10 $targetIP > snmpwalk-all_$targetIP.results"
+			cmd="snmpwalk -c public -v1 $targetIP | tee ./Recon/SNMP/snmpwalk-all_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd${NONE}\n"
 			$cmd
 			echo ""
@@ -339,7 +333,12 @@ call_option() {
 			help
 			;;
 		$coffee)
-			echo -e "${YELLOW}${BOLD}Coffee, pwn, repeat.${NONE}\n"
+			echo -e "${YELLOW}${BOLD}coffee${NONE}"
+			sleep 1s
+			echo -e "${YELLOW}${BOLD}pwn${NONE}"
+			sleep 1s
+			echo -e "${YELLOW}${BOLD}repeat${NONE}\n"
+			sleep 1s
 			;;
 		$close|"exit")
 			echo -e "${YELLOW}${BOLD}Thanks for playing.${NONE}\n"
