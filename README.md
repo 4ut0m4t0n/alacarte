@@ -15,26 +15,25 @@ While A la carte can be used by anyone performing enumeration against a single t
 ## Guide
 The tool is (hopefully) pretty intuitive and easy to use.  The primary script is contained in alacarte.sh and the additional smtp-enum.py and users.txt files are only required for executing the SMTP module.
 ```  
-user@kali:~$ ./alacarte.sh
+user@kali:~/git/alacarte$ ./alacarte.sh                                         
+          _                                         
   \      | |                              _         
  _____   | | _____     ____ _____  ____ _| |_ _____ 
 (____ |  | |(____ |   / ___|____ |/ ___|_   _) ___ |
 / ___ |  | |/ ___ |  ( (___/ ___ | |     | |_| ____|
 \ ____|   \_)_____|   \____)_____|_|      \__)_____)
-Author: 4UT0M4T0N
-                                                   
+Author: 4UT0M4T0N   
                                                    
 Enter target[:port] or -h for help: -h
                                                    
                                                    
 *********************************************************************
-                                                   
+
 A la carte v0.1
 Author: 4UT0M4T0N, Copyright 2020
 Comments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null
 
-This tool helps automate repetive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across ses
-sions.
+This tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.
 
 USAGE
 ./alacarte.sh [target][:port] [command]
@@ -43,13 +42,13 @@ TARGET
 IPv4 address (can include sub-dirs)
 
 COMMAND
-nmap - Quick, Full, and Vuln scans
+nmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans
 dir_http - Runs dirsearch, dirb, and gobuster against HTTP
 dir_https - Runs dirsearch, dirb, and gobuster against HTTPS
 smb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient
 nikto - well...nikto
 smtp - requires SMTP enumeration Python script and username list
-snmp - Runs OneSixtyOne, snmp-check, and snmpwalk
+snmp - Runs OneSixtyOne and snmpwalk
 
 EXAMPLES
 ./alacarte.sh
@@ -82,9 +81,9 @@ DEFAULT COMMANDS
 (13) Exit
 
 CUSTOM COMMANDS
-None
+None 
 
-Select a # to run: 13   
+Select a # to run: 
 ```
 ## Menu Options
 ### Change Target
@@ -133,8 +132,6 @@ This module attempts to verify whether specified user accounts exist on the targ
 
 ### Add
 This module allows the user to insert a custom-defined command into the menu.  As long as the alacarte.txt file is not moved/deleted between sessions, the custom commands will persistent across sessions.
-Example:
-Adding threader3000.py (Author: Joe Helle https://github.com/dievus/threader3000) as a custom command.
 ```
 Current target: Not set
 
@@ -158,7 +155,7 @@ None
 
 Select a # to run: 9
 
-Type the command to add. Use 'target' as an IP placeholder (i.e ping target): python3 threader3000.py target
+Type the command to add. Use 'target' as an IP placeholder (i.e ping target): python3 my_custom_script.py target
 ```
 Now available to run from the main menu.
 ```
@@ -180,7 +177,7 @@ DEFAULT COMMANDS
 (13) Exit
 
 CUSTOM COMMANDS
-(14) python3 threader3000.py target
+(14) python3 my_custom_script.py target
 
 Select a # to run: 
 ```
