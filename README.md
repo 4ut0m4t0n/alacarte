@@ -25,12 +25,11 @@ user@kali:~/git/alacarte$ ./alacarte.sh
 Author: 4UT0M4T0N   
                                                    
 Enter target[:port] or -h for help: -h
-                                                   
-                                                   
+
 *********************************************************************
 
 A la carte v0.1
-Author: 4UT0M4T0N, Copyright 2020
+Author: 4UT0M4T0N
 Comments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null
 
 This tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.
@@ -47,7 +46,7 @@ dir_http - Runs dirsearch, dirb, and gobuster against HTTP
 dir_https - Runs dirsearch, dirb, and gobuster against HTTPS
 smb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient
 nikto - well...nikto
-smtp - requires SMTP enumeration Python script and username list
+smtp - Enumerates username list against port 25; requires smtp_enum.py and username list
 snmp - Runs OneSixtyOne and snmpwalk
 
 EXAMPLES
@@ -106,15 +105,14 @@ This module runs the following scans in order, again prioritizing those which co
 Identical to the HTTP scans, but for HTTPS (port 443 should be included when entering the target IP address).
 
 ### SMB
-1. enum4linux
-2. nbtscan
-3. nmap smb-os-discovery
-4. nmap smb-protocols
-5. nmap smb vuln* scripts
-6. nmap smb enum scripts
-7. smbmap
-8. smbclient share listing
-9. smbclient anonymous login
+1. nbtscan
+2. nmap smb-os-discovery
+3. nmap smb-protocols
+4. nmap smb vuln* scripts
+5. nmap smb enum scripts
+6. smbmap
+7. smbclient share listing as anonymous
+8. enum4linux
 
 ### Nikto
 Runs Nikto against ports 80 and 443.
