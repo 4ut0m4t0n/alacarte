@@ -1,7 +1,3 @@
-#add output to SMB
-#add recursive to dirsearch
-
-
 #Copyright 2020, 4UT0M4T0N
 #This program is free software: you can redistribute it and/or modify it under the terms of version 2 of the GNU General Public License as published by the Free Software Foundation.  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.  For a copy of the GNU General Public License, see <https://www.gnu.org/licenses/>.
 
@@ -46,11 +42,11 @@ ${GRAY}Author: 4UT0M4T0N${NONE}\n"
 
                                                                                                                                                                                                           
 help() {
-	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N, Copyright 2020\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - requires SMTP enumeration Python script and username list\nsnmp - Runs OneSixtyOne and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
+	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N, Copyright 2020\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - Enumerates username list against port 25; requires smtp_enum.py and username list\nsnmp - Runs OneSixtyOne and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
 menu
 
 }
-
+#validate IP address format
 ip_check() {
 	if [[ $targetIP =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3} ]]; then
 		return 1
@@ -59,15 +55,18 @@ ip_check() {
 	fi
 }
 
-
+#check for requested module and execute
 call_option() {
-	
 	while true
 	do 
 		ip_check
+
+		#if running module that doesn't require IP address
 		if [ $? == 1 ] || [ $choice == 1 ] || [ $choice == 9 ] || [ $choice == 10 ] || [ $choice == 11 ] || [ $choice == 12 ] || [ $choice == 13 ]; then
 			break
-		else
+	
+		#otherwise loop until valid IP is entered	
+		else	
 			while true
 			do
 				read -p "Enter target[:port]: " targetIP
@@ -169,12 +168,6 @@ call_option() {
 		#SMB
 		$smb|"smb")
 			mkdir ./Recon/SMB 2>/dev/null
-			out="./Recon/SMB/enum4linux_$targetIP.results"
-                        echo -e "${GREEN}${BOLD}===== Running enum4linux =====${NONE}\n"
-			cmd="enum4linux -a $targetIP > ./Recon/SMB/enum4linux_$targetIP.results"
-                        echo -e "${RED}${BOLD}$cmd\n${NONE}"
-			$cmd
-			printf '\n'
 
                         echo -e "${GREEN}${BOLD}===== Running nbtscan =====${NONE}\n"
 			cmd="nbtscan -r $targetIP > ./Recon/SMB/nbtscan_$targetIP.results"
@@ -213,16 +206,18 @@ call_option() {
 			$cmd
 			echo ""
 			
+			#testing anonymous login and attempting to list shares
 			echo -e "${GREEN}${BOLD}===== Listing shares with smbclient =====${NONE}\n"
-			cmd="smbclient -L //$targetIP > ./Recon/SMB/smbclient-list_$targetIP.results"
+			cmd="smbclient -L //$targetIP -N | tee ./Recon/SMB/smbclient-list_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
 			echo ""
-			
-			echo -e "${GREEN}${BOLD}===== Testing for anonymous login =====${NONE}\n"
-			cmd="smbclient -L //$targetIP -U\"%\""
-			echo -e "${RED}${BOLD}$cmd${NONE}\n" 
+                        
+			echo -e "${GREEN}${BOLD}===== Running enum4linux =====${NONE}\n"
+			cmd="enum4linux -a $targetIP | tee ./Recon/SMB/enum4linux_$targetIP.results"
+                        echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
+			printf '\n'
 			;; 
 		#Nikto
 		$nikto|"nikto")
@@ -345,7 +340,8 @@ call_option() {
 			echo -e "${YELLOW}${BOLD}Thanks for playing.${NONE}\n"
 			exit 0
 			;;
-			
+		
+		#will run saved custom command exactly as written	
 		*)
 			echo -e "${GREEN}${BOLD}===== Running Custom Command  =====${NONE}\n"
 			cmd="${list[(($choice-1))]}"
@@ -358,23 +354,30 @@ call_option() {
 	echo	
 }
 
-
+#menu items
 list=("Change target" "nmap" "Directory enumeration (HTTP)" "Directory enumeration (HTTPS)" "SMB enumeration" "Nikto scan" "SMTP user scan" "SNMP enumeration" "Add a custom command" "Delete a custom command" "Help" "Out of ideas..." "Exit")
 
+#main menu
 menu () {
 	echo -e "\n\n"
 	ip_check
+
+	#if user entered IP as arg during initial launch
 	if [ $? == 1 ]; then
 		echo -e "Current target: ${RED}$targetIP${NONE}"
 	else
 		echo -e "Current target: ${RED}Not set${NONE}"
 	fi
+
 	echo -e "\n${UNDERLINE}DEFAULT COMMANDS${NONE}"
+	
+	#print the 13 standard menu options
 	for i in {0..12};
 	do
 		echo \($(($i+1))\) ${list[$i]}
 	done
 
+	#if present and not already loaded into array, read in saved custom commands from alacarte.txt
 	if [[ $loaded -eq 0 && -s "$custom_file" ]]; then
 		loaded=1
 		readarray -t tmp < $custom_file
@@ -382,6 +385,8 @@ menu () {
 	fi
 
 		echo -e "\n${UNDERLINE}CUSTOM COMMANDS${NONE}"
+	
+	#and print them as menu options
 	if [ -s alacarte.txt ]; then
 		len=${#list[@]}
 		for j in $(seq 13 $((len-1)));
@@ -396,6 +401,7 @@ menu () {
 	read choice
 	echo
 
+	#bounds checking on menu selection value
 	while true
 	do
 		local l=${#list[@]}
@@ -409,19 +415,23 @@ menu () {
         menu	
 }
 
+#entry point
 echo -e "$BANNER"
-mkdir Recon 2>/dev/null
-loaded=0 #flag for command file load
+mkdir Recon 2>/dev/null  #create Recon dir to save results files
+loaded=0 	#custom command file alacarte.txt not yet read
 custom_file="./alacarte.txt"
 [ ! -f "$custom_file" ] && echo -e "${RED}${BOLD}Creating alacarte.txt to save custom commands.${NONE}" && touch alacarte.txt
 
+#checking for optional args when script was launched
 if [[ "$*" == "-h" ]]; then
 	help
-elif [ -z $1 ]; then
+
+elif [ -z $1 ]; then	#target IP was not set during launch; prompt for input
 	read -p 'Enter target[:port] or -h for help: ' targetIP
 	if [ "$targetIP" == "-h" ]; then
 		help
 	else
+		#first prompt for target IP after launch
 		ip_check
 		if [ $? == 1 ]; then
 			printf 'Target has been set as %s\n\n' $targetIP
@@ -431,10 +441,14 @@ elif [ -z $1 ]; then
 		fi
 		menu
 	fi
+
+#user set target IP as arg during launch
 elif [ "$#" -eq 1 ]; then
 	targetIP=$1
 	printf 'Target has been set as %s\n\n' $targetIP
 	menu
+
+#user set target IP and module during launch
 elif [ "$#" -eq 2 ]; then
 	targetIP=$1
 	choice=$2
