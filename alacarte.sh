@@ -42,7 +42,7 @@ ${GRAY}Author: 4UT0M4T0N${NONE}\n"
 
                                                                                                                                                                                                           
 help() {
-	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N, Copyright 2020\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - Enumerates username list against port 25; requires smtp_enum.py and username list\nsnmp - Runs OneSixtyOne and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
+	echo -e "${GREEN}\n$lb\nA la carte v0.1\nAuthor: 4UT0M4T0N\nComments or suggestions? Find me on Twitter (@4UT0M4T0N) or Discord (#1276).  Trolls > /dev/null\n\nThis tool helps automate repetitive initial enumeration steps.  Some of the most common functions are included as default options, but you can also add your own custom commands which will be saved across sessions.\n\nUSAGE\n./alacarte.sh [target][:port] [command]\n\nTARGET\nIPv4 address (can include sub-dirs)\n\nCOMMAND\nnmap - Quick TCP, Quick UDP (requires sudo), Full TCP, and Vuln scans\ndir_http - Runs dirsearch, dirb, and gobuster against HTTP\ndir_https - Runs dirsearch, dirb, and gobuster against HTTPS\nsmb - Runs enum4linux, nbtscan, nmap enum/vuln scans, and smbclient\nnikto - well...nikto\nsmtp - Enumerates username list against port 25; requires smtp_enum.py and username list\nsnmp - Runs OneSixtyOne and snmpwalk\n\nEXAMPLES\n./alacarte.sh\n./alacarte.sh 192.168.1.5 -- sets target IP\n./alacarte.sh 192.168.1.5/supersecretfolder -- sets target IP (including sub-directory)\n./alacarte.sh 192.168.1.5:443 -- sets target IP and port\n./alacarte.sh 192.168.1.5 nmap -- sets target IP and kicks off nmap\n./alacarte.sh 192.168.1.5:443 nmap -- sets IP, port, and kicks of command\n$lb${NONE}"
 menu
 
 }
@@ -194,7 +194,7 @@ call_option() {
                         $cmd
                         printf '\n'
 
-			echo -e "${GREEN}${BOLD}===== Running nmap SMB scripts =====${NONE}\n"
+			echo -e "${GREEN}${BOLD}===== Running nmap smb enum scripts =====${NONE}\n"
 			cmd="nmap -Pn -p 139,445 --script=smb-enum* $targetIP -oN ./Recon/SMB/nmap-smb-enum_$targetIP.results"
 			echo -e "${RED}${BOLD}$cmd\n${NONE}"
 			$cmd
